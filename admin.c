@@ -13,17 +13,17 @@ void add_user() {
     SSL *ssl;
     int sock;
     struct sockaddr_in serv_addr;
-    char buffer[1024] = {0};
+    char buffer[1024] = {0}; // Buffer to store data to be sent/received
     char name[100], email[100], password[100];
 
-    // Create the socket for this transaction
+    // Create the socket for the connection
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        perror("Socket creation error");
+        perror("Socket creation error"); // Error creating socket
         return;
     }
 
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(PORT);
+    serv_addr.sin_family = AF_INET;  // Set address family to AF_INET (IPv4)
+    serv_addr.sin_port = htons(PORT); // Set port number
 
     // Convert address to binary and connect to the server
     if (inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr) <= 0) {
@@ -32,6 +32,7 @@ void add_user() {
         return;
     }
 
+    // Establish the connection with the server
     if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
         perror("Connection failed");
         close(sock);
@@ -45,16 +46,16 @@ void add_user() {
         close(sock);
         return;
     }
-    SSL_load_error_strings();
-    OpenSSL_add_ssl_algorithms();
+    SSL_load_error_strings(); // Load OpenSSL error strings
+    OpenSSL_add_ssl_algorithms(); // Add SSL algorithms
 
-    ssl = SSL_new(ctx);
-    SSL_set_fd(ssl, sock);
+    ssl = SSL_new(ctx); // Create a new SSL object
+    SSL_set_fd(ssl, sock); // Associate the SSL object with the socket
 
     // Perform the SSL handshake
     if (SSL_connect(ssl) <= 0) {
         perror("SSL connect failed");
-        ERR_print_errors_fp(stderr);
+        ERR_print_errors_fp(stderr); // Print SSL errors if handshake fails
         close(sock);
         return;
     }
@@ -62,17 +63,17 @@ void add_user() {
     // Get user details from the admin
     printf("Enter user's name: ");
     fgets(name, sizeof(name), stdin);
-    name[strcspn(name, "\n")] = 0; // Remove newline character
+    name[strcspn(name, "\n")] = 0; // Remove newline character from input
 
     printf("Enter user's email: ");
     fgets(email, sizeof(email), stdin);
-    email[strcspn(email, "\n")] = 0;
+    email[strcspn(email, "\n")] = 0; // Remove newline character from input
 
     printf("Enter user's password: ");
     fgets(password, sizeof(password), stdin);
-    password[strcspn(password, "\n")] = 0;
+    password[strcspn(password, "\n")] = 0; // Remove newline character from input
 
-    // Format the details into a single string
+    // Format the details into a single string to send to the server
     sprintf(buffer, "%s,%s,%s", name, email, password);
 
     // Send the details to the server using SSL_write
@@ -85,7 +86,7 @@ void add_user() {
     }
 
     // Receive the server's response using SSL_read
-    memset(buffer, 0, sizeof(buffer)); // Clear the buffer
+    memset(buffer, 0, sizeof(buffer)); // Clear the buffer before reading response
     if (SSL_read(ssl, buffer, sizeof(buffer)) < 0) {
         perror("Failed to read server response");
         SSL_free(ssl);
@@ -93,12 +94,12 @@ void add_user() {
         close(sock);
         return;
     }
-    printf("Server response: %s\n", buffer);
+    printf("Server response: %s\n", buffer); // Print server's response
 
     // Clean up
-    SSL_free(ssl);
-    SSL_CTX_free(ctx);
-    close(sock); // Close the socket after the request
+    SSL_free(ssl); // Free SSL object
+    SSL_CTX_free(ctx); // Free SSL context
+    close(sock); // Close the socket after the transaction
 }
 
 // Function to set the encryption method
@@ -106,17 +107,17 @@ void set_encryption_method() {
     SSL *ssl;
     int sock;
     struct sockaddr_in serv_addr;
-    char buffer[1024] = {0};
-    char method[10];
+    char buffer[1024] = {0}; // Buffer to store data to be sent/received
+    char method[10]; // Variable to store the encryption method
 
-    // Create the socket for this transaction
+    // Create the socket for the connection
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        perror("Socket creation error");
+        perror("Socket creation error"); // Error creating socket
         return;
     }
 
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(PORT);
+    serv_addr.sin_family = AF_INET;  // Set address family to AF_INET (IPv4)
+    serv_addr.sin_port = htons(PORT); // Set port number
 
     // Convert address to binary and connect to the server
     if (inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr) <= 0) {
@@ -125,6 +126,7 @@ void set_encryption_method() {
         return;
     }
 
+    // Establish the connection with the server
     if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
         perror("Connection failed");
         close(sock);
@@ -138,16 +140,16 @@ void set_encryption_method() {
         close(sock);
         return;
     }
-    SSL_load_error_strings();
-    OpenSSL_add_ssl_algorithms();
+    SSL_load_error_strings(); // Load OpenSSL error strings
+    OpenSSL_add_ssl_algorithms(); // Add SSL algorithms
 
-    ssl = SSL_new(ctx);
-    SSL_set_fd(ssl, sock);
+    ssl = SSL_new(ctx); // Create a new SSL object
+    SSL_set_fd(ssl, sock); // Associate the SSL object with the socket
 
     // Perform the SSL handshake
     if (SSL_connect(ssl) <= 0) {
         perror("SSL connect failed");
-        ERR_print_errors_fp(stderr);
+        ERR_print_errors_fp(stderr); // Print SSL errors if handshake fails
         close(sock);
         return;
     }
@@ -155,7 +157,7 @@ void set_encryption_method() {
     // Get the new encryption method from the admin
     printf("Enter encryption method (ROT13/Atbash ): ");
     fgets(method, sizeof(method), stdin);
-    method[strcspn(method, "\n")] = 0; // Remove newline character
+    method[strcspn(method, "\n")] = 0; // Remove newline character from input
 
     // Format the command to set encryption
     sprintf(buffer, "SET_ENCRYPTION:%s", method);
@@ -170,7 +172,7 @@ void set_encryption_method() {
     }
 
     // Receive the server's response using SSL_read
-    memset(buffer, 0, sizeof(buffer)); // Clear the buffer
+    memset(buffer, 0, sizeof(buffer)); // Clear the buffer before reading response
     if (SSL_read(ssl, buffer, sizeof(buffer)) < 0) {
         perror("Failed to read server response");
         SSL_free(ssl);
@@ -178,12 +180,12 @@ void set_encryption_method() {
         close(sock);
         return;
     }
-    printf("Server response: %s\n", buffer);
+    printf("Server response: %s\n", buffer); // Print server's response
 
     // Clean up
-    SSL_free(ssl);
-    SSL_CTX_free(ctx);
-    close(sock); // Close the socket after the request
+    SSL_free(ssl); // Free SSL object
+    SSL_CTX_free(ctx); // Free SSL context
+    close(sock); // Close the socket after the transaction
 }
 
 int main() {
@@ -199,6 +201,7 @@ int main() {
         scanf("%d", &choice);
         getchar(); // Consume the newline character left by scanf
 
+        // Handle the user's choice
         switch (choice) {
             case 1:
                 add_user(); // Call the add_user function
