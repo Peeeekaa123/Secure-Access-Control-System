@@ -55,7 +55,7 @@ SSL/TLS is a tool that keeps data safe while it moves between the client (employ
 - SSL/TLS protects all communication over the internet.
 
 # Update and install essential build tools
-sudo apt update
+sudo apt update ;
 sudo apt install build-essential -y
 
 # Install OpenSSL development libraries
