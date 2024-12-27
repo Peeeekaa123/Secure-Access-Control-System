@@ -61,6 +61,9 @@ sudo apt install build-essential -y
 # Install OpenSSL development libraries
 sudo apt install libssl-dev -y
 
+# Install libc6-dev 
+sudo apt install libc6-dev
+
 # Compile the C program
 # Replace 'program.c' with the name of your C file and 'output' with the desired output file name
 gcc program.c -o output -lssl -lcrypto
