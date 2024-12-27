@@ -8,8 +8,31 @@
 
 #define PORT 8080
 
-// Function to add a user
-void add_user() {
+// generate a password for the created employee
+void generatePassword(char password[100]) {
+    const char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    int length = sizeof(charset) - 1;
+
+    // Seed the random number generator
+    srand(time(NULL));
+
+    // Generate a 12-character password
+    for (int i = 0; i < 12; i++) {
+        password[i] = charset[rand() % length];
+    }
+
+    // Null-terminate the password string
+    password[12] = '\0';
+    
+    /*
+    // Future improvement: Implement a process to send the generated password to the employee,
+    // either via email or SMS, depending on the preferred method of communication.
+    */
+
+    printf("generated password : %s \n", password);
+}
+// Function to add an employee
+void add_employee() {
     SSL *ssl;
     int sock;
     struct sockaddr_in serv_addr;
@@ -60,18 +83,16 @@ void add_user() {
         return;
     }
 
-    // Get user details from the admin
-    printf("Enter user's name: ");
+    // Get employee details from the admin
+    printf("Enter employee's name: ");
     fgets(name, sizeof(name), stdin);
     name[strcspn(name, "\n")] = 0; // Remove newline character from input
 
-    printf("Enter user's email: ");
+    printf("Enter employee's email: ");
     fgets(email, sizeof(email), stdin);
     email[strcspn(email, "\n")] = 0; // Remove newline character from input
 
-    printf("Enter user's password: ");
-    fgets(password, sizeof(password), stdin);
-    password[strcspn(password, "\n")] = 0; // Remove newline character from input
+    generatePassword(password);
 
     // Format the details into a single string to send to the server
     sprintf(buffer, "%s,%s,%s", name, email, password);
@@ -194,17 +215,17 @@ int main() {
     // Menu loop
     while (1) {
         printf("\nAdmin Menu:\n");
-        printf("1. Add a user\n");
+        printf("1. Add an employee\n");
         printf("2. Set encryption method\n");
         printf("3. Exit\n");
         printf("Enter your choice: ");
         scanf("%d", &choice);
         getchar(); // Consume the newline character left by scanf
 
-        // Handle the user's choice
+        // Handle the employee's choice
         switch (choice) {
             case 1:
-                add_user(); // Call the add_user function
+                add_employee(); // Call the add_employee function
                 break;
             case 2:
                 set_encryption_method(); // Call the set_encryption_method function
