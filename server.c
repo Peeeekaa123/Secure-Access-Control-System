@@ -8,7 +8,7 @@
 #include <openssl/err.h>
 
 #define PORT 8080  // Port number for the server
-#define DATABASE_FILE "users_database.txt"  // Path to the user database file
+#define DATABASE_FILE "employees_database.txt"  // Path to the employee database file
 #define ENCRYPTION_METHOD_FILE "encryption_method.txt"  // Path to the file storing the encryption method
 
 char encryption_method[10] = "";  // Holds the current encryption method (e.g., "ROT13", "Atbash")
@@ -63,14 +63,14 @@ void hash_password(const char *password, char *hashed_password) {
     hashed_password[SHA256_DIGEST_LENGTH * 2] = '\0';  // Null-terminate the string
 }
 
-// Function to save user data (name, email, hashed password) to the database
+// Function to save employee data (name, email, hashed password) to the database
 void save_to_database(const char *name, const char *email, const char *hashed_password) {
     FILE *file = fopen(DATABASE_FILE, "a");  // Open the file in append mode
     if (file == NULL) {
         perror("Could not open database file");
         exit(EXIT_FAILURE);
     }
-    fprintf(file, "%s,%s,%s\n", name, email, hashed_password);  // Write user data to the file
+    fprintf(file, "%s,%s,%s\n", name, email, hashed_password);  // Write employee data to the file
     fclose(file);
 }
 
@@ -95,7 +95,7 @@ int verify_employee_credentials(const char *password_hash) {
 
     char line[265];  // Buffer to read each line from the file
     while (fgets(line, sizeof(line), file)) {
-        char stored_name[100], stored_email[100], stored_hash[65];  // Variables for each user's data
+        char stored_name[100], stored_email[100], stored_hash[65];  // Variables for each employee's data
 
         // Parse the stored data from the file (name, email, and hashed password)
         sscanf(line, "%99[^,],%99[^,],%64[^,]", stored_name, stored_email, stored_hash);
@@ -228,7 +228,6 @@ int main() {
             close(new_socket);
             continue;
         }
-        printf("Received data: %s\n", buffer);
 
         // Handle different commands sent by the client
         if (strncmp(buffer, "SET_ENCRYPTION:", 15) == 0) {
@@ -247,8 +246,6 @@ int main() {
             char encrypted_password[100];
             char decrypted_password[100];
             sscanf(buffer + 6, "%s", encrypted_password);  // Get the encrypted password from the client
-            printf("Received password: %s\n", encrypted_password);
-            printf("Encryption method: %s\n", encryption_method);
 
             // Decrypt the password using the chosen method
             if (strcmp(encryption_method, "ROT13") == 0) {
@@ -262,21 +259,19 @@ int main() {
                 printf("No decryption method matched!\n");
                 strcpy(decrypted_password, encrypted_password);
             }
-            printf("Decrypted password: %s\n", decrypted_password);
 
             // Hash the decrypted password and verify the credentials
             char hashed_password[SHA256_DIGEST_LENGTH * 2 + 1];
             hash_password(decrypted_password, hashed_password);
-            printf("Hashed password: %s\n", hashed_password);
 
             if (verify_employee_credentials(hashed_password) == 1) {
-                SSL_write(ssl, "Login successful!", 17);  // Send success response
+                SSL_write(ssl, "Access permitted!", 17);  // Send success response
             } else {
-                SSL_write(ssl, "Login failed!", 13);  // Send failure response
+                SSL_write(ssl, "Access denied!", 14);  // Send failure response
             }
         } 
         else {
-            // Parse user data (name, email, password) and save to the database
+            // Parse employee data (name, email, password) and save to the database
             char name[100], email[100], password[100];
             sscanf(buffer, "%[^,],%[^,],%s", name, email, password);
 
@@ -284,13 +279,13 @@ int main() {
             char hashed_password[SHA256_DIGEST_LENGTH * 2 + 1];
             hash_password(password, hashed_password);
 
-            // Save the user to the database
+            // Save the employee to the database
             save_to_database(name, email, hashed_password);
 
-            printf("User '%s' added successfully.\n", name);
+            printf("employee '%s' added successfully.\n", name);
 
             // Send success response to the admin
-            char *response = "User added successfully!";
+            char *response = "employee added successfully!";
             SSL_write(ssl, response, strlen(response));
         }
 
