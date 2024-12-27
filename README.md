@@ -70,3 +70,6 @@ gcc program.c -o output -lssl -lcrypto
 
 # Run the compiled program
 ./output
+
+### Note !!!!
+After running the server program, enter the PEM passphrase "mohamed" to establish the SSL/TLS connection.
