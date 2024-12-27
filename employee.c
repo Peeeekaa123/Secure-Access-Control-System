@@ -57,15 +57,10 @@ void send_login_request(char *password) {
     int sock;
     struct sockaddr_in serv_addr;
     char buffer[1024] = {0};
-    printf("password %s\n", password);
-    printf("enc method : %s\n", encryption_method);
-    
     // Check the encryption method and apply corresponding cipher
     if (strcmp(encryption_method, "ROT13") == 0) {
-        printf("ROT13\n");
         rot13_cipher(password);  // Apply ROT13 if matched
     } else if (strcmp(encryption_method, "Atbash") == 0) {
-        printf("Atbash\n");
         atbash_cipher(password);  // Apply Atbash cipher if matched
     } else {
         printf("No matched encryption method!\n");
@@ -207,7 +202,7 @@ int main() {
     get_encryption_method(ssl, encryption_method);
     printf("Encryption method from server: %s\n", encryption_method);
 
-    // Prompt user for password input
+    // Prompt employee for password input
     printf("Enter your password: ");
     fgets(password, sizeof(password), stdin);
     password[strcspn(password, "\n")] = '\0'; // Remove newline character
