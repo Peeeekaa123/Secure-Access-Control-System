@@ -317,7 +317,7 @@ int main() {
             // Send the current encryption method to the client
             SSL_write(ssl, encryption_method, strlen(encryption_method));
         } 
-        else if (strncmp(buffer, "LOGIN:", 6) == 0) {
+        else if (strncmp(buffer, "ACCESS:", 6) == 0) {
             char encrypted_password[100];
             char decrypted_password[100];
             sscanf(buffer + 6, "%s", encrypted_password);  // Get the encrypted password from the client
