@@ -12,34 +12,108 @@
 
 char encryption_method[10] = "";
 
-// Function to perform Atbash cipher encryption
-void atbash_cipher(char *text) {
-    for (int i = 0; text[i] != '\0'; i++) {
-        // Reverse the alphabet for lowercase letters
-        if ('a' <= text[i] && text[i] <= 'z') {
-            text[i] = 'z' - (text[i] - 'a');
+typedef struct Node {
+    char data;
+    struct Node* next;
+} Node;
+
+// Function to create a new node
+Node* createNode(char data) {
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    newNode->data = data;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Function to insert a character at the end of the list
+Node* stringToList(const char* str) {
+    Node* head = NULL;
+    Node* temp = NULL;
+
+    for (int i = 0; str[i] != '\0'; i++) {
+        Node* newNode = createNode(str[i]);
+        if (head == NULL) {
+            head = newNode;
+        } else {
+            temp->next = newNode;
         }
-        // Reverse the alphabet for uppercase letters
-        else if ('A' <= text[i] && text[i] <= 'Z') {
-            text[i] = 'Z' - (text[i] - 'A');
-        }
+        temp = newNode;
     }
+    return head;
+}
+// Function to free the linked list's memory
+void freeList(Node* head) {
+    Node* temp = head;
+    while (temp != NULL) {
+        Node* nextNode = temp->next;
+        free(temp);  // Free the current node
+        temp = nextNode;
+    }
+}
+// Function to copy the linked list back into the string
+void listToString(Node* head, char* str) {
+    Node* temp = head;
+    int i = 0;
+    while (temp != NULL) {
+        str[i++] = temp->data;
+        temp = temp->next;
+    }
+    str[i] = '\0';  // Null-terminate the string
+}
+
+// Function to perform Atbash cipher encryption
+void atbash_cipher(char* str) {
+    // Convert string to linked list
+    Node* list = stringToList(str);
+
+    Node* temp = list;
+    while (temp != NULL) {
+        if (temp->data >= 'A' && temp->data <= 'Z') {
+            // Atbash for uppercase letters
+            temp->data = 'Z' - (temp->data - 'A');
+        } else if (temp->data >= 'a' && temp->data <= 'z') {
+            // Atbash for lowercase letters
+            temp->data = 'z' - (temp->data - 'a');
+        }
+        temp = temp->next;
+    }
+
+    // Convert modified linked list back to string
+    listToString(list, str);
+    freeList(list);
+
 }
 
 // Function for ROT13 cipher encryption
-void rot13_cipher(char *text) {
-    for (int i = 0; text[i] != '\0'; i++) {
-        // Apply ROT13 encryption for lowercase letters
-        if ('a' <= text[i] && text[i] <= 'z') {
-            text[i] = ((text[i] - 'a' + 13) % 26) + 'a';
-        }
-        // Apply ROT13 encryption for uppercase letters
-        else if ('A' <= text[i] && text[i] <= 'Z') {
-            text[i] = ((text[i] - 'A' + 13) % 26) + 'A';
-        }
-    }
-}
+void rot13_cipher(char* str) {
+    // Convert string to linked list
+    Node* list = stringToList(str);
 
+    Node* temp = list;
+    while (temp != NULL) {
+        if (temp->data >= 'A' && temp->data <= 'Z') {
+            // ROT13 for uppercase letters
+            if (temp->data + 13 > 'Z') {
+                temp->data -= 13;
+            } else {
+                temp->data += 13;
+            }
+        } else if (temp->data >= 'a' && temp->data <= 'z') {
+            // ROT13 for lowercase letters
+            if (temp->data + 13 > 'z') {
+                temp->data -= 13;
+            } else {
+                temp->data += 13;
+            }
+        }
+        temp = temp->next;
+    }
+
+    // Convert modified linked list back to string
+    listToString(list, str);
+    freeList(list);
+
+}
 // Function to get the encryption method from the server
 void get_encryption_method(SSL *ssl, char *encryption_method) {
     char buffer[1024];
