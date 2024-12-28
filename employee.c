@@ -125,8 +125,8 @@ void get_encryption_method(SSL *ssl, char *encryption_method) {
     strncpy(encryption_method, buffer, 10); // Copy method to the global variable
 }
 
-// Function to send login request to the server with password
-void send_login_request(char *password) {
+// Function to send access request to the server with password
+void send_access_request(char *password) {
     SSL *ssl;
     int sock;
     struct sockaddr_in serv_addr;
@@ -184,8 +184,8 @@ void send_login_request(char *password) {
     }
 
     password[strcspn(password, "\n")] = 0; // Remove newline character from input
-    sprintf(buffer, "LOGIN:%s", password); // Format the login request
-    // Send the login request to the server using SSL_write
+    sprintf(buffer, "ACCESS:%s", password); // Format the access request
+    // Send the access request to the server using SSL_write
     if (SSL_write(ssl, buffer, strlen(buffer)) < 0) {
         perror("Failed to send data to server");
         SSL_free(ssl);
@@ -281,8 +281,8 @@ int main() {
     fgets(password, sizeof(password), stdin);
     password[strcspn(password, "\n")] = '\0'; // Remove newline character
 
-    // Send the login request to the server
-    send_login_request(password);
+    // Send the access request to the server
+    send_access_request(password);
 
     // Close SSL connection and clean up
     SSL_shutdown(ssl);
