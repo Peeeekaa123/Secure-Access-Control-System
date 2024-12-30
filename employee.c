@@ -184,7 +184,7 @@ void send_access_request(char *password) {
     }
 
     password[strcspn(password, "\n")] = 0; // Remove newline character from input
-    sprintf(buffer, "ACCESS:%s", password); // Format the access request
+    sprintf(buffer, "ACCESS%s", password); // Format the access request
     // Send the access request to the server using SSL_write
     if (SSL_write(ssl, buffer, strlen(buffer)) < 0) {
         perror("Failed to send data to server");
