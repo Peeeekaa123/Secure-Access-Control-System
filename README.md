@@ -1,75 +1,84 @@
-### Summary  
-This file explains the roles of the admin, employee, and server in this secure access control system. It highlights how passwords are handled securely, the use of ROT13 and Atbash for simple encryption, and the importance of SSL/TLS for network-level security. Additionally, it clarifies the difference between these encryption methods and their purposes.
+# Secure Access Control System  
+
+This system provides secure user management and data transmission using a combination of basic encoding methods (ROT13 and Atbash) and robust SSL/TLS encryption for network security.  
 
 ---
 
-### Simplified Explanation  
+## Summary  
 
-**Admin (admin.c):**  
+This system is composed of three main components:  
+1. **Admin**: Manages user accounts and selects encoding methods.  
+2. **Employee**: Gains system access by verifying credentials.  
+3. **Server**: Manages authentication, user data, and secure communication.  
+
+The system employs basic encoding (ROT13/Atbash) for internal password handling and SSL/TLS for network-level encryption.  
+
+---
+
+## System Components  
+
+### **Admin (`admin.c`)**  
 - Adds users to the system by entering their name, email, and password.  
-- Passwords are scrambled (hashed) and stored securely.  
-- Chooses the encryption method (ROT13 or Atbash) for communication between employees and the server.  
+- Scrambles (hashes) passwords for secure storage.  
+- Chooses the encoding method (ROT13 or Atbash) for employee-server communication.  
 
-**Employee (employee.c):**  
-- Logs in by using the selected encryption method to scramble their password before sending it to the server.  
-- The server checks the scrambled password against its database to confirm their identity.  
+### **Employee (`employee.c`)**  
+- Gains access by encoding their password with the selected method before sending it to the server.  
+- The server verifies the encoded password against its database.  
 
-**Server (server.c):**  
-- Manages adding users, choosing the encryption method, and handling login attempts.  
-- Keeps a database with scrambled passwords for security.  
-- Supports ROT13 and Atbash encryption for added password safety.  
-- Uses SSL/TLS for secure communication to ensure all data sent between employees/admin and the server stays private.  
+### **Server (`server.c`)**  
+- Manages user data, encoding method selection, and access attempts.  
+- Stores scrambled passwords for secure authentication.  
+- Uses SSL/TLS to secure all data exchanges, preventing eavesdropping or tampering.  
 
 ---
 
-### How SSL/TLS Works  
-SSL/TLS is a tool that keeps data safe while it moves between the client (employee or admin) and the server. Here's how it works:  
+## Secure Communication with SSL/TLS  
+
+### **How It Works**  
 1. **Handshake Process:**  
-   - The server shares its SSL/TLS certificate (with its public key) with the client.  
-   - The client checks if the certificate is real by comparing it with trusted sources (Certificate Authorities or CAs).  
-   - If valid, the client and server agree on a special "session key" for encryption.  
+   - The server sends its SSL/TLS certificate to the client.  
+   - The client verifies the certificate’s authenticity through a trusted Certificate Authority (CA).  
+   - Once verified, the client and server agree on a "session key" for encryption.  
 
-2. **Encrypted Communication:**  
-   - From then on, all messages between the client and server are scrambled using the session key, keeping them safe from prying eyes.  
+2. **Encrypted Data Exchange:**  
+   - All communication between the client and server is encrypted using the session key.  
 
-**PEM Passphrase:**  
-- The server's private key, needed for SSL/TLS, is locked with a PEM passphrase for extra security.  
-- The admin must enter the passphrase to unlock the key and let SSL/TLS work.  
-- Without it, the server cannot secure connections.  
+### **PEM Passphrase**  
+- The server’s private key is protected by a PEM passphrase, adding an extra layer of security.  
+- The admin must input the passphrase (`mohamed`) to enable SSL/TLS encryption.
 
 ---
 
-### ROT13/Atbash vs. SSL/TLS  
+## ROT13/Atbash vs. SSL/TLS  
 
-1. **ROT13/Atbash Encryption (Simple Security):**  
-   - These are basic tools that change passwords into unreadable forms before sending them to the server.  
-   - They only protect the password and are not strong enough to secure data over the network.  
+1. **ROT13/Atbash (Basic Encoding):**  
+   - Simple methods that transform passwords into unreadable text.  
+   - Serve as an additional layer of obfuscation but are not secure for network-level protection.  
 
-2. **SSL/TLS Encryption (Strong Network Security):**  
-   - SSL/TLS scrambles all data sent between the client and server to keep it private and untampered.  
-   - It prevents spying, hacking, and data alteration during transmission.  
-   - SSL/TLS is a reliable and widely used standard for online security.  
+2. **SSL/TLS (Robust Encryption):**  
+   - Ensures all data transmitted between the client and server is encrypted.  
+   - Protects against eavesdropping, data alteration, and unauthorized access.  
+   - A standard protocol for secure online communication.  
 
-**In Summary:**  
-- ROT13 and Atbash hide passwords within the app.  
-- SSL/TLS protects all communication over the internet.
-# Install KALI LINUX 
-# Update and install essential build tools
-sudo apt update ;
-sudo apt install build-essential -y
+---
 
-# Install OpenSSL development libraries
-sudo apt install libssl-dev -y
+## Installation and Usage  
 
-# Install libc6-dev 
+### **Install Required Tools on Kali Linux**  
+```bash
+sudo apt update  
+sudo apt install build-essential -y  
+sudo apt install libssl-dev -y  
 sudo apt install libc6-dev
-
-# Compile the C program
-# Replace 'program.c' with the name of your C file and 'output' with the desired output file name
-gcc program.c -o output -lssl -lcrypto
-
-# Run the compiled program
-./output
-
-### Note !!!!
-After running the server program, enter the PEM passphrase "mohamed" to establish the SSL/TLS connection.
+```
+### **Compile the C Program (Replace program.c with the name of your C file and output with the desired output file name.)** 
+```bash
+gcc program.c -o output -lssl -lcrypto  
+```
+### **Run the Program** 
+```bash
+./output   
+```
+### **Input the PEM Passphrase**
+Enter the PEM passphrase mohamed when prompted to initialize SSL/TLS.
